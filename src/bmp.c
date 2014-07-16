@@ -5,7 +5,13 @@ void draw(BYTE1* data, size_t width, size_t height){
 	HDC hdc = NULL;
 	size_t x = 0, y = 0, data_size_per_line = 0;
 
-	data_size_per_line = (width*3+3)/4*4;
+	if ((width * 3) % 4 == 0)
+	{
+		data_size_per_line = width * 3 / 4 * 4;
+	}else{
+		data_size_per_line = width * 3 / 4 * 4 + 4;
+	}
+
 	hdc = GetDC(NULL);
 	
 	for (y = 0; y < height; ++y)
@@ -70,7 +76,13 @@ void img_read(const char* image_path){
 		printf("mode: %s\n", "index");
 	}
 
-	data_size_per_line = (bitmap_info_header_buffer->biWidth* bitmap_info_header_buffer->biBitCount+31)/8;
+	if ((bitmap_info_header_buffer->biWidth * 3) % 4 == 0)
+	{
+		data_size_per_line = (bitmap_info_header_buffer->biWidth * bitmap_info_header_buffer->biBitCount / 8) / 4 * 4;
+	}else{
+		data_size_per_line = (bitmap_info_header_buffer->biWidth * bitmap_info_header_buffer->biBitCount / 8) / 4 * 4 + 4;
+	}
+	
 	len_info_data = sizeof(BYTE1) * data_size_per_line * bitmap_info_header_buffer->biHeight;
 	data = (BYTE1*)malloc(len_info_data);
 	memset(data, 0, len_info_data);
