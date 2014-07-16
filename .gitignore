@@ -7,3 +7,6 @@
 #vim
 *.swp
 *~
+
+# depends
+/deps/

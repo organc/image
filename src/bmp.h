@@ -22,7 +22,7 @@ typedef struct _BITMAPFILEHEADER
 	BYTE2  bfReserved1;
 	BYTE2  bfReserved2;
 	BYTE4  bfOffBits;
-} BITMAPFILEHEADER;
+} BitmapFileHeader;
 
 typedef struct _BITMAPINFOHEADER{ 
 	BYTE4  biSize;
@@ -36,13 +36,20 @@ typedef struct _BITMAPINFOHEADER{
 	BYTE4  biYPelsPerMeter;
 	BYTE4  biClrUsed;
 	BYTE4  biClrImportant;
-} BITMAPINFOHEADER;
+} BitmapInfoHeader;
 
 typedef struct _RGBQUAD {
 	BYTE1  rgbBlue;
 	BYTE1  rgbGreen;
 	BYTE1  rgbRed;
 	BYTE1  rgbReserved;
-} RGBQUAD;
+} RGBQuad;
+
+typedef struct _RGBPx
+{
+	BYTE1  R;
+	BYTE1  G;
+	BYTE1  B;
+} RGBPx;
 
 #pragma pack(pop)
