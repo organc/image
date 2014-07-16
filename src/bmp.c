@@ -12,7 +12,7 @@ void draw(BYTE1* data, size_t width, size_t height){
 	{
 		for (x = 0; x < width; ++x)
 		{
-			SetPixel(hdc, x, y, RGB(data[y*data_size_per_line+x] , data[y*data_size_per_line+x+1] , data[y*data_size_per_line+x+2] ));
+			SetPixel(hdc, x, y, RGB(data[y*data_size_per_line+3*x+2] , data[y*data_size_per_line+3*x+1] ,  data[y*data_size_per_line+3*x]));
 		}
 	}
 }
