@@ -53,3 +53,7 @@ typedef struct _RGBPx
 } RGBPx;
 
 #pragma pack(pop)
+
+RGBPx* bmp_get_matrix(const char* image_path);
+
+void bmp_info(const char* image_path);
