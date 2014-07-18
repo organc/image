@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "memory.h"
+#include "math.h"
 
 #if defined _WIN32
 	typedef __int8  BYTE1;

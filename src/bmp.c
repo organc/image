@@ -18,6 +18,8 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	size_t matrix_len = 0;
 	int x = 0, y = 0;
 	RGBPx* matrix = NULL;
+	int tab_num = 0;
+	RGBQuad* tab = NULL;
 
 	fp = fopen(image_path, "rb");
 	len_file_hdr = sizeof(BitmapFileHeader);
@@ -29,24 +31,48 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	memset(info_hdr_buf, 0, len_info_hdr);
 	fread(info_hdr_buf, len_info_hdr, 1, fp);
 
-	if (file_hdr_buf->bfOffBits - 54 < 0){
-		return NULL;
-	}else if(file_hdr_buf->bfOffBits - 54 == 0){
-	}else if(file_hdr_buf->bfOffBits - 54 > 0){
-		return NULL;
-	}
-
 	memset(data_matrix, 0, sizeof(Matrix));
 	data_matrix->width = info_hdr_buf->biWidth;
 	data_matrix->height = info_hdr_buf->biHeight;
 
-	if ((info_hdr_buf->biWidth * 3) % 4 == 0)
-	{
-		data_size_per_line = (info_hdr_buf->biWidth * info_hdr_buf->biBitCount / 8) / 4 * 4;
-	}else{
-		data_size_per_line = (info_hdr_buf->biWidth * info_hdr_buf->biBitCount / 8) / 4 * 4 + 4;
+	if (info_hdr_buf->biBitCount == 1){
+		if (info_hdr_buf->biWidth % (8 * 4) == 0)
+		{
+			data_size_per_line = info_hdr_buf->biWidth / (8 * 4) * 4;
+		}else{
+			data_size_per_line = (info_hdr_buf->biWidth / (8 * 4) + 1) * 4;
+		}
+	}else if (info_hdr_buf->biBitCount == 4){
+		if (info_hdr_buf->biWidth % (2 * 4) == 0)
+		{
+			data_size_per_line = info_hdr_buf->biWidth / (2 * 4) * 4;
+		}else{
+			data_size_per_line = (info_hdr_buf->biWidth / (2 * 4) + 1) * 4;
+		}
+	}else if (info_hdr_buf->biBitCount == 8){
+		if (info_hdr_buf->biWidth % (1 * 4) == 0)
+		{
+			data_size_per_line = info_hdr_buf->biWidth / (1 * 4) * 4;
+		}else{
+			data_size_per_line = (info_hdr_buf->biWidth / (1 * 4) + 1) * 4;
+		}
+	}else if (info_hdr_buf->biBitCount == 24){
+		if ((info_hdr_buf->biWidth * 3) % 4 == 0)
+		{
+			data_size_per_line = (info_hdr_buf->biWidth * info_hdr_buf->biBitCount / 8) / 4 * 4;
+		}else{
+			data_size_per_line = (info_hdr_buf->biWidth * info_hdr_buf->biBitCount / 8) / 4 * 4 + 4;
+		}
 	}
-	
+
+	if (info_hdr_buf->biBitCount != 24)
+	{
+		tab_num = (int)pow(2, info_hdr_buf->biBitCount);
+		tab = (RGBQuad*)malloc(sizeof(RGBQuad)*tab_num);
+		memset(tab, 0, sizeof(RGBQuad)*tab_num);
+		fread(tab, sizeof(RGBQuad), tab_num, fp);
+	}
+
 	len_info_data = sizeof(BYTE1) * data_size_per_line * info_hdr_buf->biHeight;
 	data = (BYTE1*)malloc(len_info_data);
 	memset(data, 0, len_info_data);
@@ -54,14 +80,75 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	matrix_len = info_hdr_buf->biWidth * info_hdr_buf->biHeight * 3;
 	matrix = (RGBPx*)malloc(matrix_len);
 	memset(matrix, 0, matrix_len);
-	for (y = 0; y < info_hdr_buf->biHeight; ++y)
+
+	if (info_hdr_buf->biBitCount == 24)
 	{
-		for (x = 0; x < info_hdr_buf->biWidth; ++x)
+		for (y = 0; y < info_hdr_buf->biHeight; ++y)
 		{
-			matrix[y*info_hdr_buf->biWidth+x].R = data[y*data_size_per_line+3*x+2];
-			matrix[y*info_hdr_buf->biWidth+x].G = data[y*data_size_per_line+3*x+1];
-			matrix[y*info_hdr_buf->biWidth+x].B = data[y*data_size_per_line+3*x+3];
+			for (x = 0; x < info_hdr_buf->biWidth; ++x)
+			{
+				matrix[y*info_hdr_buf->biWidth+x].R = data[y*data_size_per_line+3*x+2];
+				matrix[y*info_hdr_buf->biWidth+x].G = data[y*data_size_per_line+3*x+1];
+				matrix[y*info_hdr_buf->biWidth+x].B = data[y*data_size_per_line+3*x+3];
+			}
 		}
+	}else{
+		int tab_index = 0;
+		BYTE1 tmp_byte = 0;
+		int b1_i = 0;
+		int b1_m = 0;
+
+		for (y = 0; y < info_hdr_buf->biHeight; ++y)
+		{
+			for (x = 0; x < info_hdr_buf->biWidth; ++x)
+			{
+				// get color table index
+				if (info_hdr_buf->biBitCount == 8)
+				{
+					tab_index = data[y*data_size_per_line + x];
+				}else if (info_hdr_buf->biBitCount == 4)
+				{
+					tmp_byte = data[y*data_size_per_line + x / 2];
+					tab_index = (x % 2 == 0)?(tmp_byte & 0x0f):((tmp_byte & 0xf0) >> 4);
+				}else if (info_hdr_buf->biBitCount == 1)
+				{
+					b1_i = x / 8;
+					b1_m = x % 8;
+					tmp_byte = data[y*data_size_per_line + x / 8];
+
+					if (b1_m == 0)
+					{
+						tab_index = (tmp_byte & 0x01) >> 0;
+					}else if (b1_m == 1)
+					{
+						tab_index = (tmp_byte & 0x80) >> 7;
+					}else if (b1_m == 2)
+					{
+						tab_index = (tmp_byte & 0x40) >> 6;
+					}else if (b1_m == 3)
+					{
+						tab_index = (tmp_byte & 0x20) >> 5;
+					}else if (b1_m == 4)
+					{
+						tab_index = (tmp_byte & 0x10) >> 4;
+					}else if (b1_m == 5)
+					{
+						tab_index = (tmp_byte & 0x08) >> 3;
+					}else if (b1_m == 6)
+					{
+						tab_index = (tmp_byte & 0x04) >> 2;
+					}else if (b1_m == 7)
+					{
+						tab_index = (tmp_byte & 0x02) >> 1;
+					}
+				}
+
+				matrix[y*info_hdr_buf->biWidth+x].R = tab[tab_index].rgbRed;
+				matrix[y*info_hdr_buf->biWidth+x].G = tab[tab_index].rgbGreen;
+				matrix[y*info_hdr_buf->biWidth+x].B = tab[tab_index].rgbBlue;
+			}
+		}
+		
 	}
 
 	fclose(fp);
