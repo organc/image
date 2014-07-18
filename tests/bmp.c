@@ -19,11 +19,13 @@ void draw(RGBPx* data, size_t width, size_t height){
 int main(int argc, char const *argv[])
 {
 	if(argc >= 2){
-		RGBPx* data = NULL;
+		Matrix* data = NULL;
 
-		bmp_info(argv[1]);
-		data = bmp_get_matrix(argv[1]);
-		draw(data, 1366, 768);
+		data = init_matrix();
+		bmp_info_print(argv[1]);
+		bmp_get_matrix(argv[1], data);
+		draw(data->matrix, data->width, data->height);
+		free_matrix(data);
 	}
 	return 0;
 }

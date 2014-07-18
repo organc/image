@@ -1,3 +1,6 @@
+#ifndef _BMP_H_
+#define _BMP_H_ 
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "memory.h"
@@ -52,8 +55,39 @@ typedef struct _RGBPx
 	BYTE1  B;
 } RGBPx;
 
+typedef struct _Matrix
+{
+	size_t width;
+	size_t height;
+	RGBPx* matrix;
+} Matrix;
+
 #pragma pack(pop)
 
-RGBPx* bmp_get_matrix(const char* image_path);
+/**
+ * create and initial matrix
+ * @return pointer of matrix
+ */
+Matrix* init_matrix();
 
-void bmp_info(const char* image_path);
+/**
+ * get matrix
+ * @param  image_path  image file path
+ * @param  data_matrix pointer of matrix
+ * @return             pointer of matrix
+ */
+Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix);
+
+/**
+ * free matrix
+ * @param data_matrix pointer of matrix
+ */
+void free_matrix(Matrix* data_matrix);
+
+/**
+ * print the headers of bmp file
+ * @param image_path file path
+ */
+void bmp_info_print(const char* image_path);
+
+#endif

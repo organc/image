@@ -1,6 +1,12 @@
 #include "bmp.h"
 
-RGBPx* bmp_get_matrix(const char* image_path){
+Matrix* init_matrix(){
+	Matrix* data = (Matrix*)malloc(sizeof(Matrix));
+	memset(data, 0, sizeof(Matrix));
+	return data;
+}
+
+Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	size_t len_file_hdr = 0;
 	size_t len_info_hdr = 0;
 	size_t len_info_data = 0;
@@ -29,6 +35,10 @@ RGBPx* bmp_get_matrix(const char* image_path){
 	}else if(file_hdr_buf->bfOffBits - 54 > 0){
 		return NULL;
 	}
+
+	memset(data_matrix, 0, sizeof(Matrix));
+	data_matrix->width = info_hdr_buf->biWidth;
+	data_matrix->height = info_hdr_buf->biHeight;
 
 	if ((info_hdr_buf->biWidth * 3) % 4 == 0)
 	{
@@ -61,11 +71,27 @@ RGBPx* bmp_get_matrix(const char* image_path){
 	data = NULL;
 	file_hdr_buf = NULL;
 	info_hdr_buf = NULL;
+	data_matrix->matrix = matrix;
 
-	return matrix;
+	return data_matrix;
 }
 
-void bmp_info(const char* image_path){
+void free_matrix(Matrix* data_matrix){
+	if (data_matrix->matrix != NULL)
+	{
+		free(data_matrix->matrix);
+		data_matrix->matrix = NULL;
+	}
+	
+	if (data_matrix != NULL)
+	{
+		free(data_matrix);
+		data_matrix = NULL;
+	}
+	
+}
+
+void bmp_info_print(const char* image_path){
 	size_t len_file_hdr = 0;
 	size_t len_info_hdr = 0;
 	size_t len_info_data = 0;
