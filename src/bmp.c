@@ -65,6 +65,7 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 		}
 	}
 
+	// read color table
 	if (info_hdr_buf->biBitCount != 24)
 	{
 		tab_num = (int)pow(2, info_hdr_buf->biBitCount);
@@ -145,10 +146,12 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 
 				matrix[y*info_hdr_buf->biWidth+x].R = tab[tab_index].rgbRed;
 				matrix[y*info_hdr_buf->biWidth+x].G = tab[tab_index].rgbGreen;
-				matrix[y*info_hdr_buf->biWidth+x].B = tab[tab_index].rgbBlue;
+				matrix[y*info_hdr_buf->biWidth+x].B = tab[tab_index].rgbBlue;				
 			}
 		}
-		
+
+		free(tab);
+		tab = NULL;
 	}
 
 	fclose(fp);
@@ -226,14 +229,37 @@ void bmp_info_print(const char* image_path){
 	printf("biClrImportant: %d[%p]\n", info_hdr_buf->biClrImportant, info_hdr_buf->biClrImportant);
 
 	printf("===========================\n");
-	if (file_hdr_buf->bfOffBits - 54 < 0){
-		printf("mode: %s\n", "ERROR!");
-		return;
-	}else if(file_hdr_buf->bfOffBits - 54 == 0){
+	if(info_hdr_buf->biBitCount == 24){
 		printf("mode: %s\n", "rgb");
-	}else if(file_hdr_buf->bfOffBits - 54 > 0){
+	}else if((info_hdr_buf->biBitCount == 1)||(info_hdr_buf->biBitCount == 4)||(info_hdr_buf->biBitCount == 8)){
 		printf("mode: %s\n", "index");
-		return;
+	}else{
+		printf("mode: %s\n", "ERROR!");
+	}
+
+	// read color table and check alpha channel
+	if (info_hdr_buf->biBitCount != 24)
+	{
+		RGBQuad* tab = NULL;
+		int tab_num = 0;
+		int i = 0;
+
+		tab_num = (int)pow(2, info_hdr_buf->biBitCount);
+		tab = (RGBQuad*)malloc(sizeof(RGBQuad)*tab_num);
+		memset(tab, 0, sizeof(RGBQuad)*tab_num);
+		fread(tab, sizeof(RGBQuad), tab_num, fp);
+
+		for (i = 0; i < info_hdr_buf->biClrUsed; ++i)
+		{
+			if(tab[i].rgbReserved){
+				printf("Warning: alpha channel contained in (%d)!\n", i);
+				break;
+			}
+		}
+
+		free(tab);
+		tab = NULL;
+		
 	}
 
 	fclose(fp);
