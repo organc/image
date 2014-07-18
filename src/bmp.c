@@ -77,6 +77,7 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	len_info_data = sizeof(BYTE1) * data_size_per_line * info_hdr_buf->biHeight;
 	data = (BYTE1*)malloc(len_info_data);
 	memset(data, 0, len_info_data);
+	// fseek(fp, file_hdr_buf->bfOffBits, SEEK_SET);
 	fread(data, sizeof(BYTE1) * data_size_per_line, info_hdr_buf->biHeight, fp);
 	matrix_len = info_hdr_buf->biWidth * info_hdr_buf->biHeight * 3;
 	matrix = (RGBPx*)malloc(matrix_len);
@@ -96,6 +97,7 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	}else{
 		int tab_index = 0;
 		BYTE1 tmp_byte = 0;
+		BYTE2 tmp_byte2 = 0;
 		int b1_i = 0;
 		int b1_m = 0;
 
@@ -106,7 +108,9 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 				// get color table index
 				if (info_hdr_buf->biBitCount == 8)
 				{
-					tab_index = data[y*data_size_per_line + x];
+					tmp_byte = data[y*data_size_per_line + x];  // here is a trap
+					memset(&tmp_byte2,tmp_byte,1);
+					tab_index = tmp_byte2;
 				}else if (info_hdr_buf->biBitCount == 4)
 				{
 					tmp_byte = data[y*data_size_per_line + x / 2];
@@ -146,7 +150,7 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 
 				matrix[y*info_hdr_buf->biWidth+x].R = tab[tab_index].rgbRed;
 				matrix[y*info_hdr_buf->biWidth+x].G = tab[tab_index].rgbGreen;
-				matrix[y*info_hdr_buf->biWidth+x].B = tab[tab_index].rgbBlue;				
+				matrix[y*info_hdr_buf->biWidth+x].B = tab[tab_index].rgbBlue;
 			}
 		}
 
@@ -243,13 +247,15 @@ void bmp_info_print(const char* image_path){
 		RGBQuad* tab = NULL;
 		int tab_num = 0;
 		int i = 0;
+		int used_colors = 0;
 
 		tab_num = (int)pow(2, info_hdr_buf->biBitCount);
 		tab = (RGBQuad*)malloc(sizeof(RGBQuad)*tab_num);
 		memset(tab, 0, sizeof(RGBQuad)*tab_num);
 		fread(tab, sizeof(RGBQuad), tab_num, fp);
 
-		for (i = 0; i < info_hdr_buf->biClrUsed; ++i)
+		used_colors = (info_hdr_buf->biClrUsed == 0)?(tab_num):(info_hdr_buf->biClrUsed);
+		for (i = 0; i < used_colors; ++i)
 		{
 			if(tab[i].rgbReserved){
 				printf("Warning: alpha channel contained in (%d)!\n", i);
