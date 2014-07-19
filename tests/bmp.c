@@ -1,5 +1,6 @@
 #include "bmp.h"
 #include "windows.h"
+#include "transform.h"
 
 void draw(RGBPx* data, size_t width, size_t height){
 	HDC hdc = NULL;
@@ -24,6 +25,11 @@ int main(int argc, char const *argv[])
 		data = init_matrix();
 		bmp_info_print(argv[1]);
 		bmp_get_matrix(argv[1], data);
+
+		// roll_x(data);
+		roll_y(data);
+		rotate_left(data);
+
 		draw(data->matrix, data->width, data->height);
 		free_matrix(data);
 	}

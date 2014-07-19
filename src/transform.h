@@ -7,40 +7,18 @@
 #include "math.h"
 #include "matrix.h"
 
-/**
- * 右旋90度
- * @param matrix matrix像素矩阵
- */
-void rotate_right(Matrix* matrix);
-
-/**
- * 左旋90度
- * @param matrix matrix像素矩阵
- */
-void rotate_left(Matrix* matrix);
-
-/**
- * x轴翻转
- * @param matrix matrix像素矩阵
- */
 void roll_x(Matrix* matrix);
 
-/**
- * y轴翻转
- * @param matrix matrix像素矩阵
- */
 void roll_y(Matrix* matrix);
 
-/**
- * zoom in[放大]
- * @param matrix matrix像素矩阵
- */
+void rotate_right(Matrix* matrix);
+
+void rotate_left(Matrix* matrix);
+
+void cut(size_t x1, size_t y1, size_t x2, size_t y2, Matrix* matrix);
+
 void zoom_in(Matrix* matrix);
 
-/**
- * zoom out[缩小]
- * @param matrix matrix像素矩阵
- */
 void zoom_out(Matrix* matrix);
 
 #endif

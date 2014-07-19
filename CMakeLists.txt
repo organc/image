@@ -9,6 +9,7 @@ set(TEST_DIR "tests/")
 
 set(READIMG_LIST
 	${SRC_DIR}/bmp.c
+	${SRC_DIR}/transform.c
 	${TEST_DIR}/bmp.c
 	)
 
