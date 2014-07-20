@@ -1,6 +1,11 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "memory.h"
+#include "common.h"
+
 #pragma pack(push)
 #pragma pack(1)
 
@@ -29,5 +34,17 @@ typedef struct _Matrix
 } Matrix;
 
 #pragma pack(pop)
+
+/**
+ * create and initial matrix
+ * @return pointer of matrix
+ */
+iexp Matrix* init_matrix();
+
+/**
+ * free matrix
+ * @param data_matrix pointer of matrix
+ */
+iexp void free_matrix(Matrix* data_matrix);
 
 #endif

@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "math.h"
 #include "matrix.h"
+#include "common.h"
 
 #pragma pack(push)
 #pragma pack(1)
@@ -43,29 +44,17 @@ typedef struct _RGBQUAD {
 #pragma pack(pop)
 
 /**
- * create and initial matrix
- * @return pointer of matrix
- */
-Matrix* init_matrix();
-
-/**
  * get matrix
  * @param  image_path  image file path
  * @param  data_matrix pointer of matrix
  * @return             pointer of matrix
  */
-Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix);
-
-/**
- * free matrix
- * @param data_matrix pointer of matrix
- */
-void free_matrix(Matrix* data_matrix);
+iexp Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix);
 
 /**
  * print the headers of bmp file
  * @param image_path file path
  */
-void bmp_info_print(const char* image_path);
+iexp void bmp_info_print(const char* image_path);
 
 #endif

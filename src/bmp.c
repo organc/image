@@ -1,11 +1,5 @@
 #include "bmp.h"
 
-Matrix* init_matrix(){
-	Matrix* data = (Matrix*)malloc(sizeof(Matrix));
-	memset(data, 0, sizeof(Matrix));
-	return data;
-}
-
 Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	size_t len_file_hdr = 0;
 	size_t len_info_hdr = 0;
@@ -168,21 +162,6 @@ Matrix* bmp_get_matrix(const char* image_path, Matrix* data_matrix){
 	data_matrix->matrix = matrix;
 
 	return data_matrix;
-}
-
-void free_matrix(Matrix* data_matrix){
-	if (data_matrix->matrix != NULL)
-	{
-		free(data_matrix->matrix);
-		data_matrix->matrix = NULL;
-	}
-	
-	if (data_matrix != NULL)
-	{
-		free(data_matrix);
-		data_matrix = NULL;
-	}
-	
 }
 
 void bmp_info_print(const char* image_path){
