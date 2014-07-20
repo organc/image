@@ -15,7 +15,7 @@ void rotate_right(Matrix* matrix);
 
 void rotate_left(Matrix* matrix);
 
-void cut(size_t x1, size_t y1, size_t x2, size_t y2, Matrix* matrix);
+void cut(size_t x1, size_t y1, size_t width, size_t height, Matrix* matrix);
 
 void zoom_in(Matrix* matrix);
 

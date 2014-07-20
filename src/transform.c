@@ -101,8 +101,30 @@ void rotate_left(Matrix* matrix){
 	tmp = NULL;
 }
 
-void cut(size_t x1, size_t y1, size_t x2, size_t y2, Matrix* matrix){
-	;
+void cut(size_t x1, size_t y1, size_t width, size_t height, Matrix* matrix){
+	size_t len = 0;
+	RGBPx* tmp = NULL;
+	size_t x = 0, y = 0, w = 0, h = 0;
+
+	w = matrix->width;
+	h = matrix->height;
+
+	len = width * height * sizeof(RGBPx);
+	tmp = (RGBPx*)malloc(len);
+	memset(tmp, 0, len);
+
+	for (y = 0; y < height; ++y)
+	{
+		for (x = 0; x < width; ++x)
+		{
+			tmp[x + y * width] = matrix->matrix[(x + x1) + (y + y1) * w];
+		}
+	}
+
+	matrix->width = width;
+	matrix->height = height;
+	free(matrix->matrix);
+	matrix->matrix = tmp;
 }
 
 void zoom_in(Matrix* matrix){

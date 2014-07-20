@@ -15,6 +15,8 @@ void draw(RGBPx* data, size_t width, size_t height){
 			SetPixel(hdc, x, y, RGB(data[y*width+x].R , data[y*width+x].G ,  data[y*width+x].B));
 		}
 	}
+
+	ReleaseDC(NULL, hdc);
 }
 
 int main(int argc, char const *argv[])
@@ -28,7 +30,8 @@ int main(int argc, char const *argv[])
 
 		// roll_x(data);
 		roll_y(data);
-		rotate_left(data);
+		// rotate_left(data);
+		cut(190, 150, 250, 350, data);
 
 		draw(data->matrix, data->width, data->height);
 		free_matrix(data);
